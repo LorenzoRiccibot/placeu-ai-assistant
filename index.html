@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlaceU · Asistente</title>
+  <meta name="description" content="Asistente de PlaceU: preguntas frecuentes para futbolistas que quieren estudiar y jugar al fútbol en universidades de Estados Unidos.">
+  <style>
+    :root {
+      --azul: #0b2545;
+      --azul-claro: #13315c;
+      --verde: #1f9d55;
+      --verde-oscuro: #17824a;
+      --fondo: #f3f5f8;
+      --blanco: #ffffff;
+      --texto: #1c2430;
+      --gris: #5b6675;
+      --borde: #dde2e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--azul);
+      color: var(--blanco);
+      padding: 28px 16px 32px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 6px; font-size: 1.8rem; letter-spacing: 0.5px; }
+    header p { margin: 0 auto; max-width: 560px; opacity: 0.9; }
+    .cta {
+      display: inline-block;
+      margin-top: 18px;
+      background: var(--verde);
+      color: var(--blanco);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: 999px;
+    }
+    .cta:hover, .cta:focus { background: var(--verde-oscuro); }
+    main { max-width: 720px; margin: -16px auto 32px; padding: 0 16px; }
+    .chat {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(11, 37, 69, 0.08);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: var(--azul-claro);
+      color: var(--blanco);
+      padding: 12px 16px;
+      font-weight: 600;
+    }
+    .chat-header small { display: block; font-weight: 400; opacity: 0.8; }
+    #mensajes {
+      padding: 16px;
+      height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      white-space: pre-line;
+    }
+    .bot { background: #eef2f7; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .usuario { background: var(--azul); color: var(--blanco); align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg a { color: var(--verde-oscuro); font-weight: 600; }
+    .preguntas {
+      border-top: 1px solid var(--borde);
+      padding: 12px 16px 16px;
+    }
+    .preguntas p { margin: 0 0 8px; color: var(--gris); font-size: 0.9rem; }
+    .botones { display: flex; flex-wrap: wrap; gap: 8px; }
+    .botones button {
+      font: inherit;
+      font-size: 0.92rem;
+      background: var(--blanco);
+      color: var(--azul);
+      border: 1px solid var(--azul);
+      border-radius: 999px;
+      padding: 7px 14px;
+      cursor: pointer;
+    }
+    .botones button:hover, .botones button:focus { background: var(--azul); color: var(--blanco); }
+    .aviso {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--gris);
+      text-align: center;
+    }
+    footer { text-align: center; padding: 0 16px 32px; }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      #mensajes { height: 340px; }
+      .msg { max-width: 92%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PlaceU</h1>
+    <p>Conectamos futbolistas de entre 17 y 23 años con universidades de Estados Unidos para estudiar una carrera y jugar al fútbol universitario.</p>
+    <a class="cta" href="https://docs.google.com/forms/d/e/1FAIpQLSfM5NcGp619IVn3llwOXmkP1gu0g1AnBaT4RKSaJN9u4zMW3A/viewform" target="_blank" rel="noopener">Quiero empezar mi proceso</a>
+  </header>
+
+  <main>
+    <section class="chat" aria-label="Asistente de preguntas frecuentes">
+      <div class="chat-header">
+        Asistente PlaceU
+        <small>Elegí una pregunta para ver la respuesta</small>
+      </div>
+      <div id="mensajes" aria-live="polite"></div>
+      <div class="preguntas">
+        <p>Preguntas frecuentes:</p>
+        <div class="botones" id="botones"></div>
+      </div>
+    </section>
+
+    <p class="aviso">Esta es una demo con respuestas predefinidas. No guarda ni envía ningún dato. Para dudas sobre tu caso particular, consultá directamente con el equipo de PlaceU.</p>
+  </main>
+
+  <footer>
+    <a class="cta" href="https://docs.google.com/forms/d/e/1FAIpQLSfM5NcGp619IVn3llwOXmkP1gu0g1AnBaT4RKSaJN9u4zMW3A/viewform" target="_blank" rel="noopener">Quiero empezar mi proceso</a>
+  </footer>
+
+  <script>
+    // Enlace al formulario oficial de PlaceU
+    const FORMULARIO = "https://docs.google.com/forms/d/e/1FAIpQLSfM5NcGp619IVn3llwOXmkP1gu0g1AnBaT4RKSaJN9u4zMW3A/viewform";
+    const CONSULTAR = "Este punto debe confirmarlo directamente el equipo de PlaceU.";
+
+    // Respuestas basadas solo en información confirmada por PlaceU
+    const faqs = [
+      {
+        pregunta: "¿Qué es PlaceU y cómo funciona?",
+        respuesta: "PlaceU es una agencia fundada por Santiago y sus hermanos Gonzalo y Gerónimo. Conecta futbolistas de entre 17 y 23 años con universidades de Estados Unidos para que puedan estudiar una carrera y jugar al fútbol universitario.\n\nLa agencia conecta al jugador, su familia y las universidades, y los acompaña durante el proceso de admisión y la preparación de la documentación. Organiza pruebas de fútbol, filma partidos, prepara vídeos de highlights y presenta jugadores a entrenadores universitarios. Según su fundador, cuenta con una red de más de 300 entrenadores con contacto directo."
+      },
+      {
+        pregunta: "¿Qué edad debo tener?",
+        respuesta: "PlaceU trabaja con futbolistas de entre 17 y 23 años.\n\nSi tenés dudas sobre tu caso particular, consultalo con el equipo de PlaceU."
+      },
+      {
+        pregunta: "¿Qué requisitos necesito?",
+        respuesta: "Los requisitos concretos pueden variar según cada caso y cada universidad. " + CONSULTAR + "\n\nLo que sí sabemos es que las oportunidades dependen, entre otros factores, del nivel del jugador."
+      },
+      {
+        pregunta: "¿Necesito saber inglés?",
+        respuesta: "Todavía no tenemos esta información confirmada. " + CONSULTAR
+      },
+      {
+        pregunta: "¿Cómo funcionan las becas?",
+        respuesta: "Las oportunidades y los porcentajes de beca dependen, entre otros factores, del nivel del jugador y del presupuesto de cada universidad.\n\nPlaceU no puede garantizar una beca, un porcentaje de financiación ni una admisión. Para conocer las posibilidades en tu caso, consultá con el equipo de PlaceU."
+      },
+      {
+        pregunta: "¿Cómo es el proceso de admisión?",
+        respuesta: "PlaceU acompaña al jugador y a su familia durante el proceso de admisión y la preparación de la documentación. Además, organiza pruebas de fútbol, filma partidos, prepara vídeos de highlights y presenta jugadores a entrenadores universitarios.\n\nLos pasos concretos y los plazos de cada universidad debe confirmarlos el equipo de PlaceU. La admisión no está garantizada."
+      },
+      {
+        pregunta: "¿Qué documentación necesito?",
+        respuesta: "PlaceU te acompaña en la preparación de la documentación. La lista exacta de documentos depende de cada caso. " + CONSULTAR
+      },
+      {
+        pregunta: "¿Cómo puedo empezar?",
+        respuesta: "El primer paso es completar el formulario oficial de PlaceU con tus datos.",
+        enlace: true
+      }
+    ];
+
+    const mensajes = document.getElementById("mensajes");
+    const botones = document.getElementById("botones");
+
+    function agregarMensaje(texto, tipo, conEnlace) {
+      const div = document.createElement("div");
+      div.className = "msg " + tipo;
+      div.textContent = texto;
+      if (conEnlace) {
+        const a = document.createElement("a");
+        a.href = FORMULARIO;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = "Abrir el formulario oficial";
+        div.appendChild(document.createElement("br"));
+        div.appendChild(a);
+      }
+      mensajes.appendChild(div);
+      mensajes.scrollTop = mensajes.scrollHeight;
+    }
+
+    faqs.forEach(function (faq) {
+      const boton = document.createElement("button");
+      boton.type = "button";
+      boton.textContent = faq.pregunta;
+      boton.addEventListener("click", function () {
+        agregarMensaje(faq.pregunta, "usuario");
+        agregarMensaje(faq.respuesta, "bot", faq.enlace);
+      });
+      botones.appendChild(boton);
+    });
+
+    agregarMensaje("¡Hola! Soy el asistente de PlaceU. Elegí una de las preguntas frecuentes de abajo y te muestro la respuesta.", "bot");
+  </script>
+</body>
+</html>
