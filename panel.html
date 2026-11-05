@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>PlaceU · Panel de ofertas (prototipo)</title>
+  <style>
+    :root {
+      --azul: #0b2545;
+      --azul-claro: #13315c;
+      --verde: #1f9d55;
+      --verde-oscuro: #17824a;
+      --amarillo: #fff4d6;
+      --rojo: #b42318;
+      --fondo: #f3f5f8;
+      --blanco: #ffffff;
+      --texto: #1c2430;
+      --gris: #5b6675;
+      --borde: #dde2e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.45;
+    }
+    .aviso-demo {
+      background: var(--amarillo);
+      border-bottom: 1px solid #f0d58a;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    header {
+      background: var(--azul);
+      color: var(--blanco);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { margin: 0; font-size: 1.2rem; }
+    nav { display: flex; gap: 6px; flex-wrap: wrap; }
+    nav button {
+      font: inherit;
+      font-size: 0.92rem;
+      background: transparent;
+      color: var(--blanco);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 999px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    nav button.activo { background: var(--blanco); color: var(--azul); }
+    main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+    .barra { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .barra input, .barra select { flex: 1 1 160px; }
+    input, select, textarea {
+      font: inherit;
+      padding: 8px 10px;
+      border: 1px solid var(--borde);
+      border-radius: 8px;
+      background: var(--blanco);
+      color: var(--texto);
+      width: 100%;
+    }
+    input[type="checkbox"] { width: auto; }
+    input[readonly] { background: #f0f3f7; }
+    textarea { min-height: 120px; resize: vertical; }
+    textarea.mail { min-height: 420px; font-size: 0.92rem; }
+    button.primario, button.secundario, button.peligro {
+      font: inherit;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 9px 16px;
+      cursor: pointer;
+      border: 1px solid var(--azul);
+    }
+    button.primario { background: var(--verde); border-color: var(--verde); color: var(--blanco); }
+    button.primario:hover { background: var(--verde-oscuro); }
+    button.primario:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.secundario { background: var(--blanco); color: var(--azul); }
+    button.peligro { background: var(--blanco); color: var(--rojo); border-color: var(--rojo); }
+    .tarjetas { display: grid; gap: 10px; }
+    .tarjeta {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tarjeta:hover { border-color: var(--azul-claro); }
+    .tarjeta .nombre { font-weight: 600; }
+    .tarjeta .detalle { color: var(--gris); font-size: 0.9rem; }
+    .etiqueta {
+      display: inline-block;
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e8eef7;
+      color: var(--azul);
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+    .etiqueta.menor { background: #fde8e7; color: var(--rojo); }
+    .panel {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .panel h2 { margin-top: 0; }
+    .panel h3 { margin: 18px 0 8px; font-size: 1rem; color: var(--azul); }
+    .datos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin: 12px 0; }
+    .datos div small { display: block; color: var(--gris); font-size: 0.8rem; }
+    .formulario { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+    .formulario label { font-size: 0.85rem; color: var(--gris); display: block; }
+    .formulario .ancho { grid-column: 1 / -1; }
+    .checks label { display: inline-flex; align-items: center; gap: 6px; margin: 0 14px 6px 0; color: var(--texto); font-size: 0.95rem; }
+    .acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .nota { font-size: 0.85rem; color: var(--gris); }
+    .alerta {
+      background: var(--amarillo);
+      border: 1px solid #f0d58a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      margin: 10px 0;
+    }
+    .total { font-weight: 700; font-size: 1.05rem; }
+    .oferta {
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .oferta .nombre { font-weight: 600; }
+    a { color: var(--azul-claro); }
+    @media (max-width: 640px) {
+      .datos, .formulario { grid-template-columns: 1fr; }
+      header h1 { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aviso-demo">Prototipo con datos de prueba. No envía mails ni guarda nada: al recargar la página vuelve al inicio.</div>
+
+  <header>
+    <h1>PlaceU · Panel de ofertas</h1>
+    <nav>
+      <button type="button" data-tab="jugadores" class="activo">Jugadores</button>
+      <button type="button" data-tab="universidades">Universidades</button>
+      <button type="button" data-tab="oferta">Nueva oferta</button>
+      <button type="button" data-tab="plantilla">Plantilla del email</button>
+    </nav>
+  </header>
+
+  <main id="vista"></main>
+
+  <script>
+    // ---------- Datos de prueba ----------
+    const LIGAS = ["NCAA D1", "NCAA D2", "NCAA D3", "NAIA", "NJCAA", "A configurar"];
+    const CONCEPTOS = [
+      { clave: "tuition", nombre: "Tuition – Matrícula académica" },
+      { clave: "housing", nombre: "Housing – Alojamiento" },
+      { clave: "meals", nombre: "Meals – Alimentación" },
+      { clave: "insurance", nombre: "Health Insurance – Seguro médico" },
+      { clave: "books", nombre: "Books & Supplies – Libros y materiales" },
+      { clave: "other", nombre: "Other Fees – Otros cargos" }
+    ];
+
+    // Jugadores inventados, con los mismos campos que el formulario de registro de PlaceU
+    const jugadores = [
+      {
+        nombre: "Tomás Ejemplo", mail: "tomas.ejemplo@mail-de-prueba.com", telefono: "+54 9 11 0000-0001",
+        nacimiento: "2009-05-14", nacionalidad: "Argentina", ciudad: "Rosario",
+        posicion: "Mediocampista Central Ofensivo", posicionAlt: "Extremo Izquierdo", posicionAlt2: "", pie: "Derecho",
+        experiencia: "Club Ficticio A, Reserva", video: "https://ejemplo.com/video-tomas", tieneVideo: "Sí",
+        estudios: "Secundario en curso", promedio: "", ingles: "Intermedio", presupuesto: "A definir",
+        carrera: "Administración de empresas", programa: "Showcase", showcase: "Buenos Aires · Febrero 2027", origen: "Instagram",
+        adulto: { nombre: "Laura Ejemplo", mail: "laura.ejemplo@mail-de-prueba.com", telefono: "+54 9 11 0000-0002" },
+        ofertas: []
+      },
+      {
+        nombre: "Martín Prueba", mail: "martin.prueba@mail-de-prueba.com", telefono: "+54 9 351 000-0003",
+        nacimiento: "2006-02-03", nacionalidad: "Argentina", ciudad: "Córdoba",
+        posicion: "Delantero Centro", posicionAlt: "", posicionAlt2: "", pie: "Izquierdo",
+        experiencia: "Club Ficticio B, Primera", video: "https://ejemplo.com/video-martin", tieneVideo: "Sí",
+        estudios: "Secundario completo", promedio: "8,2", ingles: "Avanzado", presupuesto: "A definir",
+        carrera: "Todavía no lo sé", programa: "Showcase", showcase: "Buenos Aires · Febrero 2027", origen: "Referido",
+        adulto: null, ofertas: []
+      },
+      {
+        nombre: "Lucas Demo", mail: "lucas.demo@mail-de-prueba.com", telefono: "+54 9 261 000-0004",
+        nacimiento: "2007-09-21", nacionalidad: "Uruguaya", ciudad: "Mendoza",
+        posicion: "Defensor Central", posicionAlt: "Lateral Derecho", posicionAlt2: "", pie: "Derecho",
+        experiencia: "Club Ficticio C, Cuarta", video: "", tieneVideo: "No",
+        estudios: "Secundario completo", promedio: "7,5", ingles: "Básico", presupuesto: "A definir",
+        carrera: "Ingeniería", programa: "A definir", showcase: "", origen: "Redes sociales",
+        adulto: null, ofertas: []
+      }
+    ];
+
+    // Universidades de ejemplo enviadas por PlaceU (costos orientativos, a validar)
+    let proximoId = 4;
+    const universidades = [
+      {
+        id: 1, nombre: "Keiser University", ciudad: "West Palm Beach", estado: "Florida", pais: "Estados Unidos",
+        liga: "NAIA", deporte: "Men's Soccer", web: "", logo: "",
+        costos: { tuition: 40626, housing: 18114, meals: 0, insurance: 0, books: 2000, other: 11096 },
+        gpa: "A confirmar según programa", toefl: "61 iBT", duolingo: "95 (Flagship Residential Campus)",
+        otrosRequisitos: "", observaciones: "Conferencia: The Sun Conference. Housing incluye Housing & Food. Other Fees incluye Transportation (2.656) y Other Expenses (8.440). Costos orientativos, a validar."
+      },
+      {
+        id: 2, nombre: "Monroe University", ciudad: "New Rochelle", estado: "New York", pais: "Estados Unidos",
+        liga: "A configurar", deporte: "Men's Soccer", web: "", logo: "",
+        costos: { tuition: 17400, housing: 7100, meals: 4000, insurance: 0, books: 200, other: 7900 },
+        gpa: "A confirmar según programa", toefl: "Configurable", duolingo: "Configurable",
+        otrosRequisitos: "", observaciones: "Liga a configurar según equipo y temporada. Other Fees incluye Fees (1.800), Instructional Resource Fee (400), Transportation (800) y Other Expenses (4.900). Costos orientativos, a validar."
+      },
+      {
+        id: 3, nombre: "Hawkeye Community College", ciudad: "Waterloo", estado: "Iowa", pais: "Estados Unidos",
+        liga: "A configurar", deporte: "A confirmar", web: "", logo: "",
+        costos: { tuition: 7050, housing: 9780, meals: 0, insurance: 1627, books: 550, other: 2993 },
+        gpa: "Evaluación de preparación académica", toefl: "61 iBT (exámenes anteriores al 21/01/2026); escala nueva de 4 desde esa fecha", duolingo: "90",
+        otrosRequisitos: "", observaciones: "Confirmar disponibilidad del programa de fútbol. Housing incluye Housing & Food. Other Fees = Personal & Transportation. Costos orientativos, a validar."
+      }
+    ];
+
+    // Plantilla editable del email
+    const plantilla = {
+      asunto: "¡Felicitaciones {{nombre}}! ¡Tenés una nueva oferta universitaria! 🇺🇸⚽",
+      cuerpo:
+`Hola {{nombre}},
+
+¡Tenemos excelentes noticias para vos!
+
+{{universidad}} se interesó en tu perfil deportivo y académico y quiere ofrecerte una oportunidad para continuar tus estudios y jugar al fútbol en Estados Unidos.
+
+¡Felicitaciones! Este es un paso muy importante en tu camino hacia el fútbol universitario.
+
+A continuación, podés conocer los detalles de tu oferta:
+
+UNIVERSITY OFFER
+
+Universidad: {{universidad}}
+Ubicación: {{ubicacion}}
+Liga / División: {{liga}}
+Costo anual sin beca: USD {{costo_sin_beca}}
+Beca ofrecida: USD {{beca}}
+Costo anual con beca: USD {{costo_con_beca}}
+
+BENEFITS INCLUDED
+
+{{beneficios}}
+
+ADMISSION REQUIREMENTS
+
+Minimum GPA: {{gpa}}
+Minimum TOEFL: {{toefl}}
+Minimum Duolingo: {{duolingo}}
+{{observaciones_requisitos}}
+{{comentarios}}
+¡Estamos muy contentos de acompañarte en este proceso!
+
+Equipo PlaceU.
+
+IMPORTANT – OFFER VALIDITY
+
+Esta oferta universitaria tiene una vigencia de 30 días corridos desde su fecha de emisión ({{fecha_emision}}) y vence el {{fecha_vencimiento}}. Una vez vencido este plazo, la universidad podrá modificar o retirar las condiciones ofrecidas.
+
+La oferta está sujeta a la admisión académica y a la decisión final de la universidad.`
+    };
+
+    // ---------- Utilidades ----------
+    const vista = document.getElementById("vista");
+
+    function esc(texto) {
+      return String(texto ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function edad(nacimiento) {
+      const hoy = new Date();
+      const n = new Date(nacimiento + "T00:00:00");
+      let e = hoy.getFullYear() - n.getFullYear();
+      if (hoy.getMonth() < n.getMonth() || (hoy.getMonth() === n.getMonth() && hoy.getDate() < n.getDate())) e--;
+      return e;
+    }
+
+    function hoyISO() {
+      const d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+
+    function sumarDias(iso, dias) {
+      const d = new Date(iso + "T00:00:00");
+      d.setDate(d.getDate() + dias);
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+
+    function fecha(iso) {
+      if (!iso) return "";
+      const [a, m, d] = iso.split("-");
+      return d + "/" + m + "/" + a;
+    }
+
+    function monto(n) {
+      return Number(n || 0).toLocaleString("es-AR");
+    }
+
+    function total(u) {
+      return CONCEPTOS.reduce((s, c) => s + (Number(u.costos[c.clave]) || 0), 0);
+    }
+
+    function opciones(lista, elegido, conTodas) {
+      return (conTodas ? '<option value="">' + conTodas + '</option>' : "") +
+        lista.map(x => '<option' + (x === elegido ? " selected" : "") + '>' + esc(x) + '</option>').join("");
+    }
+
+    function dato(titulo, valor) {
+      return '<div><small>' + titulo + '</small>' + valor + '</div>';
+    }
+
+    // ---------- Navegación ----------
+    const pestañas = document.querySelectorAll("nav button");
+    pestañas.forEach(b => b.onclick = () => ir(b.dataset.tab));
+
+    function ir(tab, extra) {
+      pestañas.forEach(b => b.classList.toggle("activo", b.dataset.tab === tab));
+      if (tab === "jugadores") verJugadores();
+      if (tab === "universidades") verUniversidades();
+      if (tab === "oferta") verNuevaOferta(extra);
+      if (tab === "plantilla") verPlantilla();
+      window.scrollTo(0, 0);
+    }
+
+    // ---------- Jugadores ----------
+    let buscarJugador = "";
+
+    function verJugadores() {
+      vista.innerHTML =
+        '<div class="barra"><input id="b-jugador" placeholder="Buscar por nombre, apellido o email" value="' + esc(buscarJugador) + '"></div>' +
+        '<div class="tarjetas" id="lista"></div>';
+      document.getElementById("b-jugador").oninput = e => { buscarJugador = e.target.value; pintarJugadores(); };
+      pintarJugadores();
+    }
+
+    function pintarJugadores() {
+      const t = buscarJugador.toLowerCase();
+      const lista = jugadores.filter(j => !t || j.nombre.toLowerCase().includes(t) || j.mail.toLowerCase().includes(t));
+      const cont = document.getElementById("lista");
+      cont.innerHTML = lista.map(j => {
+        const e = edad(j.nacimiento);
+        return '<div class="tarjeta" data-i="' + jugadores.indexOf(j) + '">' +
+          '<div><div class="nombre">' + esc(j.nombre) + (e < 18 ? '<span class="etiqueta menor">Menor</span>' : "") + '</div>' +
+          '<div class="detalle">' + esc(j.mail) + ' · ' + esc(j.posicion) + ' · ' + e + ' años</div></div>' +
+          '<div><span class="etiqueta">' + j.ofertas.length + (j.ofertas.length === 1 ? " oferta" : " ofertas") + '</span></div>' +
+        '</div>';
+      }).join("") || '<p class="nota">No hay jugadores con esa búsqueda.</p>';
+      cont.querySelectorAll(".tarjeta").forEach(el => el.onclick = () => verJugador(jugadores[el.dataset.i]));
+    }
+
+    function verJugador(j) {
+      const e = edad(j.nacimiento);
+      const adulto = j.adulto
+        ? esc(j.adulto.nombre) + " · " + esc(j.adulto.mail) + " · " + esc(j.adulto.telefono)
+        : (e < 18 ? '<span style="color:var(--rojo)">Falta cargar (obligatorio por ser menor)</span>' : "No corresponde");
+
+      const ofertas = j.ofertas.length ? j.ofertas.map(o =>
+        '<div class="oferta">' +
+          '<div class="nombre">' + esc(o.universidad) + '</div>' +
+          '<div class="nota">' + esc(o.ubicacion) + ' · ' + esc(o.liga) + '</div>' +
+          '<div>Beca ofrecida: USD ' + monto(o.beca) + ' · Costo final: USD ' + monto(o.costoFinal) + '</div>' +
+          '<div>Beneficios: ' + esc(o.beneficios.length ? o.beneficios.join(", ") : "Ninguno") + '</div>' +
+          '<div>Requisitos: GPA ' + esc(o.gpa) + ' · TOEFL ' + esc(o.toefl) + ' · Duolingo ' + esc(o.duolingo) + '</div>' +
+          (o.comentarios ? '<div>Comentarios: ' + esc(o.comentarios) + '</div>' : "") +
+          '<div class="nota">Emitida el ' + fecha(o.emision) + ' · vence el ' + fecha(o.vencimiento) + ' · envío simulado</div>' +
+        '</div>').join("")
+        : '<p class="nota">Todavía no recibió ofertas.</p>';
+
+      vista.innerHTML =
+        '<div class="panel">' +
+          '<button type="button" class="secundario" id="volver">← Volver</button>' +
+          '<h2 style="margin-top:12px">' + esc(j.nombre) + (e < 18 ? '<span class="etiqueta menor">Menor</span>' : "") + '</h2>' +
+          '<h3>Datos personales</h3>' +
+          '<div class="datos">' +
+            dato("Email", esc(j.mail)) +
+            dato("Teléfono (WhatsApp)", esc(j.telefono)) +
+            dato("Edad", e + " años (nació el " + fecha(j.nacimiento) + ")") +
+            dato("Nacionalidad", esc(j.nacionalidad)) +
+            dato("Ciudad donde vive", esc(j.ciudad)) +
+            dato("Adulto responsable", adulto) +
+          '</div>' +
+          '<h3>Datos deportivos</h3>' +
+          '<div class="datos">' +
+            dato("Posición", esc(j.posicion)) +
+            dato("Posiciones alternativas", esc([j.posicionAlt, j.posicionAlt2].filter(Boolean).join(", ") || "—")) +
+            dato("Pie hábil", esc(j.pie)) +
+            dato("Experiencia deportiva", esc(j.experiencia)) +
+            dato("Video de highlights", j.video ? '<a href="' + esc(j.video) + '" target="_blank" rel="noopener">Ver video</a>' : esc(j.tieneVideo === "No" ? "No tiene" : "—")) +
+          '</div>' +
+          '<h3>Datos académicos</h3>' +
+          '<div class="datos">' +
+            dato("Nivel de estudios", esc(j.estudios)) +
+            dato("Promedio del secundario", esc(j.promedio || "—")) +
+            dato("Nivel de inglés", esc(j.ingles)) +
+            dato("Carrera que quiere estudiar", esc(j.carrera)) +
+          '</div>' +
+          '<h3>Programa</h3>' +
+          '<div class="datos">' +
+            dato("Programa de interés", esc(j.programa)) +
+            dato("Showcase", esc(j.showcase || "—")) +
+            dato("Presupuesto aproximado", esc(j.presupuesto)) +
+            dato("Cómo nos conoció", esc(j.origen)) +
+          '</div>' +
+          '<div class="acciones"><button type="button" class="primario" id="nueva">Nueva oferta para este jugador</button></div>' +
+        '</div>' +
+        '<div class="panel"><h2>My University Offers</h2>' + ofertas + '</div>';
+
+      document.getElementById("volver").onclick = () => ir("jugadores");
+      document.getElementById("nueva").onclick = () => ir("oferta", { jugador: j });
+    }
+
+    // ---------- Universidades ----------
+    const buscarU = { texto: "", lugar: "", liga: "" };
+
+    function verUniversidades() {
+      vista.innerHTML =
+        '<div class="barra">' +
+          '<input id="u-texto" placeholder="Buscar por nombre" value="' + esc(buscarU.texto) + '">' +
+          '<input id="u-lugar" placeholder="Estado o ciudad" value="' + esc(buscarU.lugar) + '">' +
+          '<select id="u-liga">' + opciones(LIGAS, buscarU.liga, "Todas las ligas") + '</select>' +
+          '<button type="button" class="primario" id="agregar">+ Agregar universidad</button>' +
+        '</div>' +
+        '<div class="tarjetas" id="lista-u"></div>';
+      document.getElementById("u-texto").oninput = e => { buscarU.texto = e.target.value; pintarUniversidades(); };
+      document.getElementById("u-lugar").oninput = e => { buscarU.lugar = e.target.value; pintarUniversidades(); };
+      document.getElementById("u-liga").onchange = e => { buscarU.liga = e.target.value; pintarUniversidades(); };
+      document.getElementById("agregar").onclick = () => editarUniversidad(null);
+      pintarUniversidades();
+    }
+
+    function filtrarUniversidades(f) {
+      const t = f.texto.toLowerCase();
+      const l = f.lugar.toLowerCase();
+      return universidades.filter(u =>
+        (!t || u.nombre.toLowerCase().includes(t)) &&
+        (!l || u.ciudad.toLowerCase().includes(l) || u.estado.toLowerCase().includes(l)) &&
+        (!f.liga || u.liga === f.liga)
+      );
+    }
+
+    function pintarUniversidades() {
+      const cont = document.getElementById("lista-u");
+      cont.innerHTML = filtrarUniversidades(buscarU).map(u =>
+        '<div class="tarjeta" data-id="' + u.id + '">' +
+          '<div><div class="nombre">' + esc(u.nombre) + '</div>' +
+          '<div class="detalle">' + esc(u.ciudad) + ', ' + esc(u.estado) + ' · ' + esc(u.liga) + ' · ' + esc(u.deporte) + '</div></div>' +
+          '<div><span class="etiqueta">USD ' + monto(total(u)) + ' por año</span></div>' +
+        '</div>'
+      ).join("") || '<p class="nota">No hay universidades con esa búsqueda.</p>';
+      cont.querySelectorAll(".tarjeta").forEach(el =>
+        el.onclick = () => editarUniversidad(universidades.find(u => u.id === Number(el.dataset.id))));
+    }
+
+    function editarUniversidad(u) {
+      const nueva = !u;
+      const d = u || {
+        nombre: "", ciudad: "", estado: "", pais: "Estados Unidos", liga: LIGAS[0], deporte: "Men's Soccer", web: "", logo: "",
+        costos: { tuition: 0, housing: 0, meals: 0, insurance: 0, books: 0, other: 0 },
+        gpa: "", toefl: "", duolingo: "", otrosRequisitos: "", observaciones: ""
+      };
+      const campo = (id, etiqueta, valor, tipo, ancho) =>
+        '<div' + (ancho ? ' class="ancho"' : "") + '><label for="' + id + '">' + etiqueta + '</label>' +
+        '<input id="' + id + '" type="' + (tipo || "text") + '" value="' + esc(valor) + '"' + (tipo === "number" ? ' min="0"' : "") + '></div>';
+
+      vista.innerHTML =
+        '<div class="panel">' +
+          '<button type="button" class="secundario" id="volver">← Volver</button>' +
+          '<h2 style="margin-top:12px">' + (nueva ? "Agregar universidad" : esc(d.nombre)) + '</h2>' +
+          '<h3>Información general</h3>' +
+          '<div class="formulario">' +
+            campo("nombre", "Nombre de la universidad *", d.nombre, "text", true) +
+            campo("ciudad", "Ciudad", d.ciudad) +
+            campo("estado", "Estado", d.estado) +
+            campo("pais", "País", d.pais) +
+            '<div><label for="liga">Liga / División</label><select id="liga">' + opciones(LIGAS, d.liga) + '</select></div>' +
+            campo("deporte", "Deporte", d.deporte) +
+            campo("web", "Página web (opcional)", d.web, "url") +
+            campo("logo", "Logo, link a la imagen (opcional)", d.logo, "url", true) +
+          '</div>' +
+          '<h3>Información económica (USD por año)</h3>' +
+          '<div class="formulario">' +
+            CONCEPTOS.map(c => campo("c-" + c.clave, c.nombre.split(" – ")[0], d.costos[c.clave], "number")).join("") +
+            '<div class="ancho">Total Cost of Attendance: <span class="total" id="total">USD ' + monto(total(d)) + '</span></div>' +
+          '</div>' +
+          '<h3>Requisitos de admisión</h3>' +
+          '<div class="formulario">' +
+            campo("gpa", "GPA mínimo (escala 4.0)", d.gpa) +
+            campo("toefl", "TOEFL mínimo", d.toefl) +
+            campo("duolingo", "Duolingo English Test mínimo", d.duolingo) +
+            campo("otros", "Otros requisitos académicos (opcional)", d.otrosRequisitos) +
+            '<div class="ancho"><label for="obs">Observaciones adicionales (opcional)</label><textarea id="obs">' + esc(d.observaciones) + '</textarea></div>' +
+          '</div>' +
+          '<div id="error"></div>' +
+          '<div class="acciones">' +
+            '<button type="button" class="primario" id="guardar">Guardar</button>' +
+            (nueva ? "" : '<button type="button" class="peligro" id="eliminar">Eliminar universidad</button>') +
+          '</div>' +
+          '<p class="nota">En este prototipo los cambios duran hasta que recargues la página.</p>' +
+        '</div>';
+
+      const leerCostos = () => {
+        const c = {};
+        CONCEPTOS.forEach(x => c[x.clave] = Math.max(0, Number(document.getElementById("c-" + x.clave).value) || 0));
+        return c;
+      };
+      CONCEPTOS.forEach(x => document.getElementById("c-" + x.clave).oninput = () => {
+        document.getElementById("total").textContent = "USD " + monto(total({ costos: leerCostos() }));
+      });
+
+      document.getElementById("volver").onclick = () => ir("universidades");
+      document.getElementById("guardar").onclick = () => {
+        const v = id => document.getElementById(id).value.trim();
+        if (!v("nombre")) {
+          document.getElementById("error").innerHTML = '<div class="alerta">El nombre es obligatorio.</div>';
+          return;
+        }
+        Object.assign(d, {
+          nombre: v("nombre"), ciudad: v("ciudad"), estado: v("estado"), pais: v("pais"), liga: v("liga"),
+          deporte: v("deporte"), web: v("web"), logo: v("logo"), costos: leerCostos(),
+          gpa: v("gpa"), toefl: v("toefl"), duolingo: v("duolingo"), otrosRequisitos: v("otros"), observaciones: v("obs")
+        });
+        if (nueva) { d.id = proximoId++; universidades.push(d); }
+        ir("universidades");
+      };
+      if (!nueva) {
+        document.getElementById("eliminar").onclick = () => {
+          if (confirm("¿Eliminar " + d.nombre + " de la base de datos? Las ofertas ya enviadas quedan en el historial de cada jugador.")) {
+            universidades.splice(universidades.indexOf(d), 1);
+            ir("universidades");
+          }
+        };
+      }
+    }
+
+    // ---------- Nueva oferta ----------
+    function verNuevaOferta(extra) {
+      const o = {
+        jugador: extra && extra.jugador ? extra.jugador : null,
+        universidad: null,
+        emision: hoyISO()
+      };
+
+      vista.innerHTML =
+        '<div class="panel">' +
+          '<h2>Nueva oferta</h2>' +
+          '<h3>1. Jugador</h3>' +
+          '<input id="o-bj" placeholder="Buscar por nombre o email">' +
+          '<select id="o-jugador" style="margin-top:8px"></select>' +
+          '<h3>2. Universidad</h3>' +
+          '<div class="barra">' +
+            '<input id="o-bu" placeholder="Buscar por nombre, estado o ciudad">' +
+            '<select id="o-liga">' + opciones(LIGAS, "", "Todas las ligas") + '</select>' +
+          '</div>' +
+          '<select id="o-universidad"></select>' +
+          '<div id="o-detalle"></div>' +
+        '</div>';
+
+      const bj = document.getElementById("o-bj");
+      const selJ = document.getElementById("o-jugador");
+      const bu = document.getElementById("o-bu");
+      const ligaU = document.getElementById("o-liga");
+      const selU = document.getElementById("o-universidad");
+
+      function listarJugadores() {
+        const t = bj.value.toLowerCase();
+        const lista = jugadores.filter(j => !t || j.nombre.toLowerCase().includes(t) || j.mail.toLowerCase().includes(t));
+        selJ.innerHTML = '<option value="">Elegí un jugador</option>' +
+          lista.map(j => '<option value="' + jugadores.indexOf(j) + '"' + (j === o.jugador ? " selected" : "") + '>' + esc(j.nombre) + ' · ' + esc(j.mail) + '</option>').join("");
+      }
+
+      function listarUniversidades() {
+        const t = bu.value.toLowerCase();
+        const lista = universidades.filter(u =>
+          (!t || u.nombre.toLowerCase().includes(t) || u.ciudad.toLowerCase().includes(t) || u.estado.toLowerCase().includes(t)) &&
+          (!ligaU.value || u.liga === ligaU.value));
+        selU.innerHTML = '<option value="">Elegí una universidad</option>' +
+          lista.map(u => '<option value="' + u.id + '"' + (u === o.universidad ? " selected" : "") + '>' + esc(u.nombre) + ' · ' + esc(u.estado) + ' · ' + esc(u.liga) + '</option>').join("");
+      }
+
+      bj.oninput = listarJugadores;
+      bu.oninput = listarUniversidades;
+      ligaU.onchange = listarUniversidades;
+      selJ.onchange = () => { o.jugador = jugadores[selJ.value] || null; pintarDetalle(); };
+      selU.onchange = () => { o.universidad = universidades.find(u => u.id === Number(selU.value)) || null; pintarDetalle(); };
+
+      function pintarDetalle() {
+        const cont = document.getElementById("o-detalle");
+        if (!o.jugador || !o.universidad) {
+          cont.innerHTML = '<p class="nota" style="margin-top:12px">Elegí un jugador y una universidad para cargar la oferta.</p>';
+          return;
+        }
+        const u = o.universidad;
+        const ro = (id, etiqueta, valor) => '<div><label for="' + id + '">' + etiqueta + '</label><input id="' + id + '" value="' + esc(valor) + '" readonly></div>';
+        const ed = (id, etiqueta, valor, tipo) => '<div><label for="' + id + '">' + etiqueta + '</label><input id="' + id + '" type="' + (tipo || "text") + '" value="' + esc(valor) + '"' + (tipo === "number" ? ' min="0"' : "") + '></div>';
+
+        cont.innerHTML =
+          '<h3>3. Datos de la oferta</h3>' +
+          '<div class="formulario">' +
+            ro("f-ubicacion", "Ubicación", u.ciudad + ", " + u.estado) +
+            ro("f-liga", "Liga / División", u.liga) +
+            ro("f-deporte", "Deporte", u.deporte) +
+            ed("f-costo", "Costo anual sin beca (USD)", total(u), "number") +
+            ed("f-beca", "4. Monto de beca ofrecido (USD)", "", "number") +
+            ro("f-porcentaje", "Porcentaje de beca", "—") +
+            ro("f-restante", "Costo anual restante (USD)", monto(total(u))) +
+            ed("f-emision", "Fecha de emisión", o.emision, "date") +
+            ro("f-vencimiento", "Fecha de vencimiento (30 días)", fecha(sumarDias(o.emision, 30))) +
+          '</div>' +
+          '<h3>5. Beneficios incluidos</h3>' +
+          '<div class="checks">' +
+            CONCEPTOS.map(c => '<label><input type="checkbox" name="beneficio" value="' + esc(c.nombre) + '"> ' + esc(c.nombre) + '</label>').join("") +
+          '</div>' +
+          '<h3>6. Requisitos de admisión de esta oferta</h3>' +
+          '<div class="formulario">' +
+            ed("f-gpa", "Minimum GPA", u.gpa) +
+            ed("f-toefl", "Minimum TOEFL", u.toefl) +
+            ed("f-duolingo", "Minimum Duolingo", u.duolingo) +
+            '<div class="ancho"><label for="f-obsreq">Observaciones sobre los requisitos (opcional)</label><input id="f-obsreq" value="' + esc(u.otrosRequisitos) + '"></div>' +
+          '</div>' +
+          '<h3>7. Additional comments (opcional)</h3>' +
+          '<textarea id="f-comentarios" placeholder="Ej.: El entrenador está interesado en coordinar una videollamada."></textarea>' +
+          '<div id="f-error"></div>' +
+          '<div class="acciones"><button type="button" class="primario" id="revisar">8. Revisar email</button></div>';
+
+        const calcular = () => {
+          const costo = Math.max(0, Number(document.getElementById("f-costo").value) || 0);
+          const beca = Math.max(0, Number(document.getElementById("f-beca").value) || 0);
+          document.getElementById("f-porcentaje").value = costo ? Math.round(beca / costo * 100) + "%" : "—";
+          document.getElementById("f-restante").value = monto(Math.max(0, costo - beca));
+          const emision = document.getElementById("f-emision").value;
+          document.getElementById("f-vencimiento").value = emision ? fecha(sumarDias(emision, 30)) : "";
+        };
+        ["f-costo", "f-beca", "f-emision"].forEach(id => document.getElementById(id).oninput = calcular);
+        document.getElementById("revisar").onclick = () => revisar(o);
+      }
+
+      listarJugadores();
+      listarUniversidades();
+      pintarDetalle();
+    }
+
+    function revisar(o) {
+      const v = id => document.getElementById(id).value.trim();
+      const costo = Number(v("f-costo"));
+      const beca = Number(v("f-beca"));
+      const error = document.getElementById("f-error");
+      if (!v("f-costo") || costo <= 0) { error.innerHTML = '<div class="alerta">Cargá el costo anual sin beca.</div>'; return; }
+      if (!v("f-beca") || beca <= 0) { error.innerHTML = '<div class="alerta">Cargá el monto de beca ofrecido.</div>'; return; }
+      if (beca > costo) { error.innerHTML = '<div class="alerta">La beca no puede ser mayor que el costo anual.</div>'; return; }
+      if (!v("f-emision")) { error.innerHTML = '<div class="alerta">Cargá la fecha de emisión.</div>'; return; }
+
+      const j = o.jugador;
+      const u = o.universidad;
+      const menor = edad(j.nacimiento) < 18;
+      if (menor && !j.adulto) { error.innerHTML = '<div class="alerta">El jugador es menor y no tiene adulto responsable cargado.</div>'; return; }
+
+      const beneficios = [...document.querySelectorAll('input[name="beneficio"]:checked')].map(x => x.value);
+      const oferta = {
+        universidad: u.nombre, ubicacion: u.ciudad + ", " + u.estado, liga: u.liga,
+        costo: costo, beca: beca, costoFinal: costo - beca, beneficios: beneficios,
+        gpa: v("f-gpa") || "A confirmar", toefl: v("f-toefl") || "A confirmar", duolingo: v("f-duolingo") || "A confirmar",
+        obsRequisitos: v("f-obsreq"), comentarios: v("f-comentarios"),
+        emision: v("f-emision"), vencimiento: sumarDias(v("f-emision"), 30)
+      };
+
+      const valores = {
+        nombre: j.nombre.split(" ")[0],
+        universidad: u.nombre,
+        ubicacion: oferta.ubicacion,
+        liga: u.liga,
+        costo_sin_beca: monto(costo),
+        beca: monto(beca),
+        costo_con_beca: monto(oferta.costoFinal),
+        beneficios: beneficios.length ? beneficios.map(b => "✔ " + b).join("\n") : "Ninguno seleccionado",
+        gpa: oferta.gpa, toefl: oferta.toefl, duolingo: oferta.duolingo,
+        observaciones_requisitos: oferta.obsRequisitos ? "Observaciones: " + oferta.obsRequisitos + "\n" : "",
+        comentarios: oferta.comentarios ? "\nADDITIONAL COMMENTS\n\n" + oferta.comentarios + "\n" : "",
+        fecha_emision: fecha(oferta.emision),
+        fecha_vencimiento: fecha(oferta.vencimiento)
+      };
+      const completar = texto => texto.replace(/{{(\w+)}}/g, (m, k) => k in valores ? valores[k] : m);
+      const para = j.mail + (menor ? " y " + j.adulto.mail + " (adulto responsable)" : "");
+
+      vista.innerHTML =
+        '<div class="panel">' +
+          '<button type="button" class="secundario" id="volver">← Volver a la oferta</button>' +
+          '<h2 style="margin-top:12px">Revisar antes de enviar</h2>' +
+          '<p class="nota">Para: ' + esc(para) + '</p>' +
+          (beneficios.length ? "" : '<div class="alerta">No marcaste ningún beneficio incluido. Revisalo antes de enviar.</div>') +
+          '<label class="nota" for="m-asunto">Asunto</label>' +
+          '<input id="m-asunto" value="' + esc(completar(plantilla.asunto)) + '">' +
+          '<label class="nota" for="m-cuerpo" style="display:block;margin-top:10px">Contenido (podés editarlo para este jugador)</label>' +
+          '<textarea id="m-cuerpo" class="mail">' + esc(completar(plantilla.cuerpo)) + '</textarea>' +
+          '<label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="m-ok"> Revisé los datos y el texto del email</label>' +
+          '<div class="acciones"><button type="button" class="primario" id="m-enviar" disabled>Confirmar y enviar (simulado)</button></div>' +
+          '<p class="nota">En este prototipo no se envía ningún email. La oferta solo se guarda en el historial del jugador hasta que recargues la página.</p>' +
+        '</div>';
+
+      document.getElementById("volver").onclick = () => ir("oferta", { jugador: j });
+      document.getElementById("m-ok").onchange = e => document.getElementById("m-enviar").disabled = !e.target.checked;
+      document.getElementById("m-enviar").onclick = () => {
+        oferta.asunto = document.getElementById("m-asunto").value;
+        oferta.texto = document.getElementById("m-cuerpo").value;
+        j.ofertas.unshift(oferta);
+        verJugador(j);
+        pestañas.forEach(b => b.classList.toggle("activo", b.dataset.tab === "jugadores"));
+      };
+    }
+
+    // ---------- Plantilla ----------
+    function verPlantilla() {
+      vista.innerHTML =
+        '<div class="panel">' +
+          '<h2>Plantilla del email</h2>' +
+          '<p class="nota">Las palabras entre llaves se completan solas con los datos de cada oferta: {{nombre}}, {{universidad}}, {{ubicacion}}, {{liga}}, {{costo_sin_beca}}, {{beca}}, {{costo_con_beca}}, {{beneficios}}, {{gpa}}, {{toefl}}, {{duolingo}}, {{observaciones_requisitos}}, {{comentarios}}, {{fecha_emision}} y {{fecha_vencimiento}}.</p>' +
+          '<label class="nota" for="p-asunto">Asunto</label>' +
+          '<input id="p-asunto" value="' + esc(plantilla.asunto) + '">' +
+          '<label class="nota" for="p-cuerpo" style="display:block;margin-top:10px">Contenido</label>' +
+          '<textarea id="p-cuerpo" class="mail">' + esc(plantilla.cuerpo) + '</textarea>' +
+          '<div class="acciones"><button type="button" class="primario" id="p-guardar">Guardar plantilla</button></div>' +
+          '<div id="p-ok"></div>' +
+        '</div>';
+      document.getElementById("p-guardar").onclick = () => {
+        plantilla.asunto = document.getElementById("p-asunto").value;
+        plantilla.cuerpo = document.getElementById("p-cuerpo").value;
+        document.getElementById("p-ok").innerHTML = '<p class="nota">Plantilla guardada (hasta que recargues la página).</p>';
+      };
+    }
+
+    ir("jugadores");
+  </script>
+</body>
+</html>
